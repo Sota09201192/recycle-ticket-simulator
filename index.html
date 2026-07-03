@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家電リサイクル券 記入確認ナビ</title>
+    <style>
+        /* ==========================================
+           全体のベースデザイン（入力フォーム）
+        ========================================== */
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            margin: 20px;
+            background-color: #edeef2;
+            color: #111;
+        }
+        .input-form-container {
+            max-width: 980px;
+            margin: 0 auto 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .form-row { display: flex; gap: 15px; margin-bottom: 12px; }
+        .form-group { flex: 1; display: flex; flex-direction: column; }
+        label { margin-bottom: 5px; font-weight: bold; font-size: 13px; color: #333; }
+        select, input { padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .hidden { display: none; }
+
+        /* ==========================================
+           🌟 家電リサイクル券 表示CSS
+        ========================================== */
+        #result-area { max-width: 980px; margin: 0 auto; }
+        .ticket-outer-box {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            overflow-x: auto;
+        }
+        
+        /* 伝票本体 */
+        .real-style-ticket {
+            width: 950px;
+            height: 540px;
+            border: 2.5px solid #00a86b;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            position: relative;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
+        /* 左側のメイン領域 */
+        .ticket-left-body {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        /* ヘッダー行 */
+        .ticket-header-row {
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0 0 10px;
+            border-bottom: 2px solid #00a86b;
+            box-sizing: border-box;
+            flex-shrink: 0;
+        }
+        .header-title-zone { display: flex; flex-direction: column; }
+        .h-main-title { font-size: 16px; font-weight: bold; color: #00a86b; }
+        .h-sub-title { font-size: 11px; font-weight: bold; color: #00a86b; margin-top: 2px; }
+        
+        .header-right-box { display: flex; align-items: stretch; height: 100%; gap: 10px; }
+        .header-mgmt-box {
+            width: 240px; height: 38px; border: 1.5px solid #00a86b; border-radius: 3px;
+            display: flex; flex-direction: column; box-sizing: border-box; margin-top: 6px;
+        }
+        .mgmt-label { background: #e6f6f0; color: #00a86b; font-size: 8px; font-weight: bold; padding: 1px 4px; }
+        .mgmt-value { font-size: 14px; font-weight: bold; font-family: monospace; text-align: center; letter-spacing: 1px; }
+
+        .far-right-vertical-bar {
+            width: 32px; background-color: #00a86b; color: #fff; writing-mode: vertical-rl;
+            text-align: center; font-weight: bold; font-size: 10px; letter-spacing: 1px;
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0;
+        }
+
+        /* 各段の共通構造 */
+        .content-row {
+            display: flex;
+            width: 100%;
+            border-bottom: 2px solid #00a86b;
+            box-sizing: border-box;
+        }
+        
+        /* 緑色の縦タイトル帯 */
+        .vertical-green-header {
+            width: 24px; background-color: #00a86b; color: #fff; writing-mode: vertical-rl;
+            text-align: center; letter-spacing: 2px; font-weight: bold; font-size: 10px;
+            display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0;
+        }
+        .block-contents { flex: 1; padding: 6px; box-sizing: border-box; background: #fff; display: flex; }
+
+        /* 段1: 排出者 & 小売業者 */
+        .sub-block-haishutsu { width: 340px; border-right: 2px solid #00a86b; display: flex; }
+        .sub-block-kouri { flex: 1; display: flex; }
+
+        /* 小売業者ブロック内部のパーツデザイン */
+        .kouri-inside-container { display: flex; flex-direction: column; width: 100%; height: 100%; }
+        .kouri-date-bar {
+            width: 100%; height: 16px; border-bottom: 1px solid #00a86b;
+            display: flex; align-items: center; background-color: #fff; box-sizing: border-box;
+            font-size: 8px; color: #00a86b; font-weight: bold;
+        }
+        .kouri-date-bar-bottom {
+            width: 100%; height: 16px; border-top: 1px solid #00a86b;
+            display: flex; align-items: center; background-color: #fff; box-sizing: border-box;
+            font-size: 8px; color: #00a86b; font-weight: bold; margin-top: auto;
+        }
+        .kouri-date-cells-wrap { display: flex; height: 100%; margin-left: auto; border-left: 1px solid #00a86b; }
+        .kd-cell {
+            width: 13px; height: 100%; border-right: 1px dotted #00a86b;
+            display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: bold; color: #111;
+        }
+        .kd-cell-lbl {
+            width: 15px; height: 100%; border-right: 1px dotted #00a86b;
+            display: flex; align-items: center; justify-content: center; font-size: 7.5px; color: #00a86b;
+        }
+        .kouri-main-text-zone { padding: 4px 6px; font-size: 8.5px; line-height: 1.25; flex: 1; display: flex; flex-direction: column; justify-content: center; }
+        .kouri-green-lbl { color: #00a86b; font-weight: bold; margin-right: 6px; display: inline-block; }
+
+        /* 段2: 品目 ＆ 製造業者 */
+        .sub-block-hinmoku { width: 340px; border-right: 2px solid #00a86b; display: flex; }
+        .sub-block-seizousha { flex: 1; display: flex; }
+
+        /* 品目テーブル */
+        .hinmoku-table { width: 100%; border-collapse: collapse; text-align: center; background: #fff; height: 100%; }
+        .hinmoku-table th, .hinmoku-table td { border: 1px solid #00a86b; padding: 2px; font-size: 9px; vertical-align: middle; position: relative; }
+        .hinmoku-table th { background-color: #e6f6f0; color: #00a86b; font-weight: bold; height: 18px; }
+        
+        .check-box-container { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px 0; }
+        .check-box-slot {
+            width: 14px; height: 14px; border: 1px solid #00a86b; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 12px; color: #d6000c; box-sizing: border-box;
+        }
+        .code-indicator { font-size: 7px; color: #444; line-height: 1; margin-top: 2px; }
+
+        /* 緑の斜線セル */
+        .slash-cell { position: relative; background: #fff; }
+        .slash-cell::after {
+            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to top right, transparent 46%, #00a86b 46%, #00a86b 54%, transparent 54%); pointer-events: none;
+        }
+
+        /* 製造業者等名テーブル */
+        .maker-table-real { width: 100%; border-collapse: collapse; background: #fff; height: 100%; }
+        .maker-table-real td { border: 1px solid #00a86b; padding: 2px 4px; font-size: 8.5px; vertical-align: middle; box-sizing: border-box; }
+        .m-cell-wrap { display: flex; align-items: center; width: 100%; height: 100%; }
+        .m-cell-wrap .check-box-slot { margin-right: 5px; flex-shrink: 0; }
+        .m-text-lbl { font-size: 9px; line-height: 1.1; color: #111; font-weight: bold; }
+        .m-code-gray { color: #00a86b; font-size: 8.5px; font-weight: normal; margin-left: 2px; }
+
+        .m-other-entry-td { background-color: #fafffa; }
+        .m-other-flex-container { display: flex; flex-direction: column; justify-content: space-between; height: 100%; }
+        .m-other-title-text { color: #00a86b; font-size: 7.5px; font-weight: bold; transform: scale(0.98); transform-origin: left top; }
+        .m-other-input-line-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+        .m-other-line-dashed { flex: 1; border-bottom: 1px dashed #00a86b; margin: 0 4px; height: 10px; }
+        .m-other-code-title { color: #00a86b; font-size: 8px; font-weight: bold; margin-right: 3px; }
+        .m-other-dots-wrap { display: flex; gap: 1px; }
+        .m-other-dots-wrap span { width: 10px; height: 12px; border: 1px dotted #00a86b; display: inline-block; border-radius: 1px; background: #fff; }
+
+        /* ーーー 段3: 最下段複合エリア ーーー */
+        .bottom-flex-container { display: flex; width: 100%; flex: 1; box-sizing: border-box; }
+        .bottom-left-notes { width: 155px; padding: 8px 6px; box-sizing: border-box; border-right: 2px solid #00a86b;}
+        .notes-text-area { font-size: 8px; color: #333; line-height: 1.3; }
+        .sub-block-unpan { width: 410px; border-right: 2px solid #00a86b; display: flex; }
+        .bottom-right-mix-zone { flex: 1; display: flex; flex-direction: column; justify-content: space-between; padding: 6px 4px; box-sizing: border-box; }
+        .price-table-final { border: 1px solid #00a86b; border-collapse: collapse; width: 100%; background: #fff; }
+        .price-table-final td { border: 1px solid #00a86b; padding: 4px; font-size: 9.5px; }
+        .lbl-green-bg { background-color: #00a86b; color: #fff; font-weight: bold; width: 110px; }
+        .val-price-text { text-align: right; font-weight: bold; color: #d6000c; font-family: monospace; }
+
+        /* 目立つ追加用注記のデザイン */
+        .red-alert-tag {
+            color: #ff0000;
+            font-weight: bold;
+            background-color: #fffae6;
+            padding: 1px 4px;
+            border: 1px solid #ffcccc;
+            border-radius: 3px;
+        }
+
+        /* 印刷設定 */
+        @media print {
+            .input-form-container, h2, p { display: none; }
+            body { background: white; margin: 0; }
+            .real-style-ticket { box-shadow: none; top: 0; left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="input-form-container">
+    <h2>家電リサイクル券 記入確認ナビ</h2>
+    <div class="form-row">
+        <div class="form-group">
+            <label>① 品目選択</label>
+            <select id="item-select">
+                <option value="">-- 選択してください --</option>
+                <option value="aircon">エアコン</option>
+                <option value="tv_br">テレビ（ブラウン管式）</option>
+                <option value="tv_lc">テレビ（液晶・有機EL・プラズマ式）</option>
+                <option value="fridge">冷蔵庫・冷凍庫</option>
+                <option value="washer">洗濯機・衣類乾燥機</option>
+            </select>
+        </div>
+        <div class="form-group hidden" id="size-group">
+            <label>② サイズ区分</label>
+            <select id="size-select"></select>
+        </div>
+        <div class="form-group hidden" id="maker-group">
+            <label>③ 製造業者（主要メーカー）</label>
+            <select id="maker-select">
+                <option value="">-- 選択してください --</option>
+                <option value="120">ダイキン工業（120）</option>
+                <option value="100">パナソニック（100）</option>
+                <option value="300">日立グローバルライフ（300）</option>
+                <option value="350">富士通ゼネラル（350）</option>
+                <option value="303">日立ジョンソン（303）</option>
+                <option value="101">三洋電機(パナソニック)（101）</option>
+                <option value="310">シャープ（310）</option>
+                <option value="392">ハイアールジャパン（392）</option>
+                <option value="114">TVS REGZA（114）</option>
+                <option value="110">東芝ライフスタイル（110）</option>
+                <option value="320">三菱電機（320）</option>
+                <option value="393">アクア（393）</option>
+                <option value="340">ソニー（340）</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>④ 排出者氏名</label>
+            <input type="text" id="f-name" value="" placeholder="例：ナゴヤ タロウ">
+        </div>
+        <div class="form-group">
+            <label>⑤ 排出者電話番号</label>
+            <input type="text" id="f-phone" value="" placeholder="例：052-123-4567">
+        </div>
+        <div class="form-group">
+            <label>⑥ 商品の回収・持込区分</label>
+            <select id="location-select">
+                <option value="">-- 選択してください --</option>
+                <option value="home">お客様宅にリサイクル商品がある場合</option>
+                <option value="bring">持ち込みの場合</option>
+            </select>
+        </div>
+    </div>
+</div>
+
+<div id="result-area" class="hidden">
+    <div class="ticket-outer-box">
+        <div class="real-style-ticket">
+            
+            <div class="ticket-left-body">
+                
+                <div class="ticket-header-row">
+                    <div class="header-title-zone">
+                        <span class="h-main-title">
+                            家電リサイクル券 <span style="font-size:10px; font-weight:normal;">(特定家庭用機器廃棄物管理票)</span>
+                            <span class="red-alert-tag" style="font-size: 11px; margin-left: 20px;">＊リサイクル料金CD：9109980 を伝票に記入</span>
+                        </span>
+                        <span class="h-sub-title">①小売業者控兼受領書</span>
+                    </div>
+                    <div class="header-right-box">
+                        <div class="header-mgmt-box">
+                            <div class="mgmt-label">お問合せ管理票番号</div>
+                            <div class="mgmt-value">1124-00034190-3</div>
+                        </div>
+                        <div class="far-right-vertical-bar">
+                            ①小売業者控兼受領書
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-row" style="height: 115px;">
+                    <div class="sub-block-haishutsu">
+                        <div class="vertical-green-header">排出者</div>
+                        <div class="block-contents" style="padding: 0; flex-direction: column;">
+                            <div style="display: flex; border-bottom: 1px solid #00a86b; height: 57px; align-items: center; padding: 0 6px; box-sizing: border-box;">
+                                <span style="font-size: 8px; color: #00a86b; width: 45px; font-weight: bold; flex-shrink: 0;">氏名</span>
+                                <strong id="t-name" style="color:#d6000c; font-size:12px;"></strong>
+                            </div>
+                            <div style="display: flex; height: 58px; align-items: center; padding: 0 6px; box-sizing: border-box;">
+                                <span style="font-size: 8px; color: #00a86b; width: 45px; font-weight: bold; flex-shrink: 0;">電話番号</span>
+                                <span id="t-phone" style="color:#d6000c; font-weight:bold; font-size:11px; font-family: monospace;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-block-kouri">
+                        <div class="vertical-green-header">小売業者</div>
+                        <div class="block-contents" style="padding: 0;">
+                            <div class="kouri-inside-container">
+                                <div class="kouri-date-bar">
+                                    <span style="padding-left: 4px;">交付日(引取日)西暦</span>
+                                    <div class="kouri-date-cells-wrap">
+                                        <div class="kd-cell">2</div><div class="kd-cell">0</div>
+                                        <div class="kd-cell" id="k-koufu-y1" style="color:#d6000c;"></div><div class="kd-cell" id="k-koufu-y2" style="color:#d6000c;"></div><div class="kd-cell-lbl">年</div>
+                                        <div class="kd-cell" id="k-koufu-m1" style="color:#d6000c;"></div><div class="kd-cell" id="k-koufu-m2" style="color:#d6000c;"></div><div class="kd-cell-lbl">月</div>
+                                        <div class="kd-cell" id="k-koufu-d1" style="color:#d6000c;"></div><div class="kd-cell" id="k-koufu-d2" style="color:#d6000c;"></div><div class="kd-cell-lbl">日</div>
+                                    </div>
+                                </div>
+                                <div class="kouri-main-text-zone">
+                                    <div><span class="kouri-green-lbl">名 称</span>○○電気店</div>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1px;">
+                                        <div><span class="kouri-green-lbl">住 所</span>〒999-9999</div>
+                                        <div style="font-size: 7.5px; color:#444; padding-right:15px;"><span style="color:#00a86b;">コード</span> 0000111112222</div>
+                                    </div>
+                                    <div style="padding-left: 28px;">△△市××ー××</div>
+                                    <div style="padding-left: 28px;">０ー００００ー０</div>
+                                    <div style="margin-top: 1px;">登録番号：T11111111111111111</div>
+                                    <div style="text-align: center; color: #00a86b; font-weight: bold; font-size: 8px; margin-top: 1px;">
+                                        (電話番号 <span style="color:#005392; font-family: monospace;">098-765-4321</span> )
+                                    </div>
+                                </div>
+                                <div class="kouri-date-bar-bottom">
+                                    <span style="padding-left: 4px;">再商品化等料金 領収日</span>
+                                    <div class="kouri-date-cells-wrap">
+                                        <div class="kd-cell">2</div><div class="kd-cell">0</div>
+                                        <div class="kd-cell" id="k-ryoushu-y1" style="color:#d6000c;"></div><div class="kd-cell" id="k-ryoushu-y2" style="color:#d6000c;"></div><div class="kd-cell-lbl">年</div>
+                                        <div class="kd-cell" id="k-ryoushu-m1" style="color:#d6000c;"></div><div class="kd-cell" id="k-ryoushu-m2" style="color:#d6000c;"></div><div class="kd-cell-lbl">月</div>
+                                        <div class="kd-cell" id="k-ryoushu-d1" style="color:#d6000c;"></div><div class="kd-cell" id="k-ryoushu-d2" style="color:#d6000c;"></div><div class="kd-cell-lbl">日</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-row" style="height: 195px;">
+                    <div class="sub-block-hinmoku">
+                        <div class="vertical-green-header">品目・料金区分</div>
+                        <div class="block-contents" style="padding: 0;">
+                            <table class="hinmoku-table" style="border:none;">
+                                <tr>
+                                    <th colspan="3" style="border-top:none; border-left:none;">品目</th>
+                                    <th style="width:30px; border-top:none;">小</th>
+                                    <th style="width:30px; border-top:none;">大</th>
+                                    <th style="width:105px; border-top:none; border-right:none;">備考</th>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="text-align:left; padding-left: 5px; font-weight: bold; border-left:none;">エアコン</td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-10" class="check-box-slot"></div>
+                                            <span class="code-indicator">10</span>
+                                        </div>
+                                    </td>
+                                    <td class="slash-cell"></td>
+                                    <td class="slash-cell"></td>
+                                    <td rowspan="5" style="font-size:7.5px; text-align:left; color:#333; line-height:1.25; padding:4px; background:#fff; vertical-align: top; border-right:none; border-bottom:none;">
+                                        テレビ、冷蔵庫・冷凍庫は大小区分がありますので、ご確認の上、該当する□に✓をご記入ください。
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td rowspan="2" style="text-align:left; padding-left: 5px; font-weight: bold; width: 45px; border-left:none;">テレビ</td>
+                                    <td style="text-align:left; padding-left: 4px; font-size: 8px; color: #444;">ブラウン管式</td>
+                                    <td class="slash-cell"></td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-21" class="check-box-slot"></div>
+                                            <span class="code-indicator">21</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-22" class="check-box-slot"></div>
+                                            <span class="code-indicator">22</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align:left; padding-left: 4px; font-size: 8px; color: #444;">液晶・有機EL・ﾌﾟﾗｽﾞﾏ式</td>
+                                    <td class="slash-cell"></td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-51" class="check-box-slot"></div>
+                                            <span class="code-indicator">51</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-52" class="check-box-slot"></div>
+                                            <span class="code-indicator">52</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="text-align:left; padding-left: 5px; font-weight: bold; border-left:none;">冷蔵庫・冷凍庫</td>
+                                    <td class="slash-cell"></td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-31" class="check-box-slot"></div>
+                                            <span class="code-indicator">31</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="check-box-container">
+                                            <div id="chk-32" class="check-box-slot"></div>
+                                            <span class="code-indicator">32</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="text-align:left; padding-left: 5px; font-weight: bold; border-left:none; border-bottom:none;">洗濯機・衣類乾燥機</td>
+                                    <td style="border-bottom:none;">
+                                        <div class="check-box-container">
+                                            <div id="chk-40" class="check-box-slot"></div>
+                                            <span class="code-indicator">40</span>
+                                        </div>
+                                    </td>
+                                    <td class="slash-cell" style="border-bottom:none;"></td>
+                                    <td class="slash-cell" style="border-bottom:none;"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="sub-block-seizousha">
+                        <div class="vertical-green-header">製造業者等名</div>
+                        <div class="block-contents" style="padding: 0;">
+                            <table class="maker-table-real" style="border:none;">
+                                <tr>
+                                    <td style="border-top:none; border-left:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-120"></div><span class="m-text-lbl">ダイキン工業<span class="m-code-gray">(120)</span></span></div></td>
+                                    <td style="border-top:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-100"></div><span class="m-text-lbl">パナソニック<span class="m-code-gray">(100)</span></span></div></td>
+                                    <td style="border-top:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-300"></div><span class="m-text-lbl">日立グローバルライフ<span class="m-code-gray">(300)</span></span></div></td>
+                                    <td style="border-top:none; border-right:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-350"></div><span class="m-text-lbl">富士通ゼネラル<span class="m-code-gray">(350)</span></span></div></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-303"></div><span class="m-text-lbl">日立ジョンソン<span class="m-code-gray">(303)</span></span></div></td>
+                                    <td><div class="m-cell-wrap"><div class="check-box-slot" id="m-101"></div><span class="m-text-lbl">三洋電機<br><span style="font-size:6.5px; font-weight:normal; color:#444;">(パナソニック)</span><span class="m-code-gray">(101)</span></span></div></td>
+                                    <td><div class="m-cell-wrap"><div class="check-box-slot" id="m-310"></div><span class="m-text-lbl">シャープ<span class="m-code-gray">(310)</span></span></div></td>
+                                    <td style="border-right:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-392"></div><span class="m-text-lbl">ハイアールジャパン<span class="m-code-gray">(392)</span></span></div></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-114"></div><span class="m-text-lbl">TVS REGZA<span class="m-code-gray">(114)</span></span></div></td>
+                                    <td><div class="m-cell-wrap"><div class="check-box-slot" id="m-110"></div><span class="m-text-lbl">東芝ライフスタイル<span class="m-code-gray">(110)</span></span></div></td>
+                                    <td><div class="m-cell-wrap"><div class="check-box-slot" id="m-320"></div><span class="m-text-lbl">三菱電機<span class="m-code-gray">(320)</span></span></div></td>
+                                    <td style="border-right:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-393"></div><span class="m-text-lbl">アクア<span class="m-code-gray">(393)</span></span></div></td>
+                                </tr>
+                                <tr>
+                                    <td style="border-left:none; border-bottom:none;"><div class="m-cell-wrap"><div class="check-box-slot" id="m-340"></div><span class="m-text-lbl">ソニー<span class="m-code-gray">(340)</span></span></div></td>
+                                    <td colspan="3" class="m-other-entry-td" style="border-right:none; border-bottom:none;">
+                                        <div class="m-other-flex-container">
+                                            <div class="m-other-title-text">表記以外の製造業者等の場合は以下の枠内に製造業者等名の略称・コードを記入してください。</div>
+                                            <div class="m-other-input-line-row">
+                                                <span style="color:#00a86b; font-size:10px;">（</span>
+                                                <div class="m-other-line-dashed"></div>
+                                                <span style="color:#00a86b; font-size:10px; margin-right:6px;">）</span>
+                                                <div class="m-other-code-title">コード</div>
+                                                <div class="m-other-dots-wrap">
+                                                    <span></span><span></span><span></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-flex-container" style="flex: 1;">
+                    <div class="bottom-left-notes">
+                        <div class="notes-text-area">
+                            <strong>※料金区分</strong><br>
+                            ●ブラウン管式テレビ<br>小:15型以下、大:16型以上<br>
+                            ●液晶・有機EL・プラズマ式<br>小:15型以下、大:16型以上<br>
+                            ●冷蔵庫・冷凍庫<br>小:170L以下、大:171L以上
+                        </div>
+                    </div>
+                    
+                    <div class="sub-block-unpan">
+                        <div class="vertical-green-header">収集運搬業者</div>
+                        <div class="block-contents" style="flex-direction: column; justify-content: space-between;">
+                            <div style="font-size:9px; font-weight:bold;">引取日 西暦：2 0 ＿＿ 年 ＿ 月 ＿ 日</div>
+                            <div class="mimic-lines-box" style="height:65px; font-size:9px; color:#777;">
+                                <strong>名称・住所：</strong><br>＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+                            </div>
+                            <div style="text-align:right; font-size:8px; color:#555;">一般財団法人家電製品協会 2026</div>
+                        </div>
+                    </div>
+
+                    <div class="bottom-right-mix-zone">
+                        <div style="border:1px solid #00a86b; background:#fff; height:24px; padding:2px; font-size:8px; color:#666; position: relative; box-sizing: border-box;">
+                            【備考（売上伝票番号など）】
+                            <span class="red-alert-tag" style="position: absolute; right: 4px; top: 3px; font-size: 8.5px; padding: 0px 3px;">＊伝票Noを記入</span>
+                        </div>
+                        
+                        <div style="font-size:9.5px; color:#ff0000; font-weight:bold; text-align:center; margin: 3px 0; background-color: #fffae6; border: 1px solid #ffcccc; padding: 3px; border-radius: 3px; letter-spacing: 0.5px;">
+                            ⚠️ ＊料金欄（下記４項目すべて）の記入は不要
+                        </div>
+                        
+                        <table class="price-table-final">
+                            <tr>
+                                <td class="lbl-green-bg">再商品化等料金</td>
+                                <td class="val-price-text">￥<span id="p-shohinka">0</span></td>
+                            </tr>
+                            <tr>
+                                <td class="lbl-green-bg">収集・運搬料金</td>
+                                <td class="val-price-text">￥<span id="p-unchin">0</span></td>
+                            </tr>
+                            <tr>
+                                <td class="lbl-green-bg">消費税</td>
+                                <td class="val-price-text" style="color:#333; text-align:center; font-size:8px;">内税</td>
+                            </tr>
+                            <tr>
+                                <td class="lbl-green-bg" style="background:#00a86b;">合 計</td>
+                                <td class="val-price-text" style="font-size:11px;">￥<span id="p-total">0</span></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const itemSelect = document.getElementById('item-select');
+    const sizeGroup = document.getElementById('size-group');
+    const sizeSelect = document.getElementById('size-select');
+    const makerGroup = document.getElementById('maker-group');
+    const makerSelect = document.getElementById('maker-select');
+    const resultArea = document.getElementById('result-area');
+
+    const fName = document.getElementById('f-name');
+    const fPhone = document.getElementById('f-phone');
+    const locationSelect = document.getElementById('location-select');
+
+    const sizeOptions = {
+        tv_br: [{ value: '21', text: '15型以下（小）[コード21]' }, { value: '22', text: '16型以上（大）[コード22]' }],
+        tv_lc: [{ value: '51', text: '15型以下（小）[コード51]' }, { value: '52', text: '16型以上（大）[コード52]' }],
+        fridge: [{ value: '31', text: '170L以下（小）[コード31]' }, { value: '32', text: '171L以上（大）[コード32]' }]
+    };
+
+    // ★ 変更点②：外部JSONデータを動的に読み込むマスターオブジェクトの定義
+    let rateMaster = {};
+
+    async function loadRateMaster() {
+        try {
+            const response = await fetch('recycling_fees.json');
+            rateMaster = await response.json();
+            console.log("最新の動的料金マスターデータをロードしました。");
+        } catch (error) {
+            console.error("料金データの動的読み込みに失敗しました。ローカルサーバー経由(Live Server等)で起動してください:", error);
+        }
+    }
+    loadRateMaster();
+
+    const targetIdMap = {
+        aircon: 'chk-10', tv_br_21: 'chk-21', tv_br_22: 'chk-22',
+        tv_lc_51: 'chk-51', tv_lc_52: 'chk-52', fridge_31: 'chk-31',
+        fridge_32: 'chk-32', washer: 'chk-40'
+    };
+
+    function updateTicket() {
+        const item = itemSelect.value;
+        const size = sizeSelect.value;
+        const maker = makerSelect.value;
+        const locType = locationSelect.value;
+
+        if (sizeOptions[item]) {
+            sizeGroup.classList.remove('hidden');
+        } else {
+            sizeGroup.classList.add('hidden');
+        }
+
+        if ((item && !sizeOptions[item]) || (item && size)) {
+            makerGroup.classList.remove('hidden');
+        } else {
+            makerGroup.classList.add('hidden');
+        }
+
+        document.getElementById('t-name').textContent = fName.value;
+        document.getElementById('t-phone').textContent = fPhone.value;
+
+        const today = new Date();
+        const y = "2026";
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+
+        document.getElementById('k-ryoushu-y1').textContent = y[2];
+        document.getElementById('k-ryoushu-y2').textContent = y[3];
+        document.getElementById('k-ryoushu-m1').textContent = m[0];
+        document.getElementById('k-ryoushu-m2').textContent = m[1];
+        document.getElementById('k-ryoushu-d1').textContent = d[0];
+        document.getElementById('k-ryoushu-d2').textContent = d[1];
+
+        if (locType === 'bring') {
+            document.getElementById('k-koufu-y1').textContent = y[2];
+            document.getElementById('k-koufu-y2').textContent = y[3];
+            document.getElementById('k-koufu-m1').textContent = m[0];
+            document.getElementById('k-koufu-m2').textContent = m[1];
+            document.getElementById('k-koufu-d1').textContent = d[0];
+            document.getElementById('k-koufu-d2').textContent = d[1];
+        } else {
+            document.getElementById('k-koufu-y1').textContent = '';
+            document.getElementById('k-koufu-y2').textContent = '';
+            document.getElementById('k-koufu-m1').textContent = '';
+            document.getElementById('k-koufu-m2').textContent = '';
+            document.getElementById('k-koufu-d1').textContent = '';
+            document.getElementById('k-koufu-d2').textContent = '';
+        }
+
+        const isItemReady = maker && (item === 'aircon' || item === 'washer' || size);
+        const isFormReady = fName.value.trim() !== "" && fPhone.value.trim() !== "" && locType !== "";
+
+        if (isItemReady && isFormReady) {
+            const key = sizeOptions[item] ? `${item}_${size}` : item;
+            
+            // ★ 変更点③：抽出されたJSONから[品目キー][メーカーコード]で料金を動的に特定
+            const itemRates = rateMaster[key];
+            const price = (itemRates && itemRates[maker]) ? itemRates[maker] : 0;
+            const unchinPrice = 0;
+
+            document.querySelectorAll('.check-box-slot').forEach(el => el.textContent = '');
+
+            const targetId = targetIdMap[key];
+            if(document.getElementById(targetId)) {
+                document.getElementById(targetId).textContent = '✔';
+            }
+            
+            const targetMakerBox = document.getElementById(`m-${maker}`);
+            if (targetMakerBox) {
+                targetMakerBox.textContent = '✔';
+            }
+
+            document.getElementById('p-shohinka').textContent = price.toLocaleString();
+            document.getElementById('p-unchin').textContent = unchinPrice.toLocaleString();
+            document.getElementById('p-total').textContent = (price + unchinPrice).toLocaleString();
+
+            resultArea.classList.remove('hidden');
+        } else {
+            resultArea.classList.add('hidden');
+        }
+    }
+
+    itemSelect.addEventListener('change', () => {
+        const item = itemSelect.value;
+        sizeSelect.innerHTML = '<option value="">-- 選択してください --</option>';
+        if (sizeOptions[item]) {
+            sizeOptions[item].forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.value; opt.textContent = o.text;
+                sizeSelect.appendChild(opt);
+            });
+        }
+        updateTicket();
+    });
+
+    sizeSelect.addEventListener('change', updateTicket);
+    makerSelect.addEventListener('change', updateTicket);
+    fName.addEventListener('input', updateTicket);
+    fPhone.addEventListener('input', updateTicket);
+    locationSelect.addEventListener('change', updateTicket);
+</script>
+
+</body>
+</html>
