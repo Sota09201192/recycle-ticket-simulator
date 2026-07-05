@@ -227,9 +227,7 @@
             .real-style-ticket { box-shadow: none; top: 0; left: 0; }
         }
 
-        /* ==========================================
-           📱 【新設】スマートフォン用レスポンシブスタイル
-        ========================================== */
+        /* スマートフォン用レスポンシブスタイル */
         @media (max-width: 768px) {
             body { margin: 10px; }
             .input-form-container { padding: 15px; }
@@ -594,17 +592,30 @@
         fridge: [{ value: '31', text: '170L以下（小）[コード31]' }, { value: '32', text: '171L以上（大）[コード32]' }]
     };
 
-    // 安定稼働するローカルデータ保持方式
-    const rateMaster = {
-        aircon:       { targetId: 'chk-10', price: 990 },
-        washer:       { targetId: 'chk-40', price: 2530 },
-        tv_br_21:     { targetId: 'chk-21', price: 1870 },
-        tv_br_22:     { targetId: 'chk-22', price: 2970 },
-        tv_lc_51:     { targetId: 'chk-51', price: 1870 },
-        tv_lc_52:     { targetId: 'chk-52', price: 2970 },
-        fridge_31:    { targetId: 'chk-31', price: 3740 },
-        fridge_32:    { targetId: 'chk-32', price: 4730 }
+    // 伝票上のチェックボックスのIDと、JSONのキーの紐付け定義
+    const targetIdMaster = {
+        aircon:   'chk-10',
+        tv_br_21: 'chk-21',
+        tv_br_22: 'chk-22',
+        tv_lc_51: 'chk-51',
+        tv_lc_52: 'chk-52',
+        fridge_31:'chk-31',
+        fridge_32:'chk-32',
+        washer:   'chk-40'
     };
+
+    let rateMaster = {}; // Pythonスクリプト経由で抽出したJSONデータを格納するオブジェクト
+
+    // Pythonで生成した外部JSONデータをロードする非同期関数
+    async function loadRecyclingFees() {
+        try {
+            const response = await fetch('recycling_fees.json');
+            rateMaster = await response.json();
+            console.log('料金データの読み込みに成功しました。', rateMaster);
+        } catch (error) {
+            console.error('料金データの読み込みに失敗しました。ローカルサーバー経由（http://...）で起動しているか確認してください。', error);
+        }
+    }
 
     function updateTicket() {
         const item = itemSelect.value;
@@ -658,23 +669,33 @@
         const isItemReady = maker && (item === 'aircon' || item === 'washer' || size);
         const isFormReady = fName.value.trim() !== "" && fPhone.value.trim() !== "" && locType !== "";
 
-        if (isItemReady && isFormReady) {
+        // 必須項目が揃っており、かつ料金JSONの読み込みが完了している場合のみ表示処理
+        if (isItemReady && isFormReady && Object.keys(rateMaster).length > 0) {
             const key = sizeOptions[item] ? `${item}_${size}` : item;
-            const data = rateMaster[key];
-            const unchinPrice = 0;
+            
+            // JSONデータから、該当品目および選択されたメーカーコードの料金を取得
+            const itemFees = rateMaster[key] || {};
+            const price = itemFees[maker] || 0; 
 
+            const targetId = targetIdMaster[key];
+            const unchinPrice = 0; // 収集運搬料金（デフォルト設定値）
+
+            // 伝票上のチェックボックスを一旦初期化
             document.querySelectorAll('.check-box-slot').forEach(el => el.textContent = '');
 
-            if(document.getElementById(data.targetId)) {
-                document.getElementById(data.targetId).textContent = '✔';
+            // 該当する品目区分にチェック
+            if(document.getElementById(targetId)) {
+                document.getElementById(targetId).textContent = '✔';
             }
             
+            // 該当する主要メーカー等名にチェック
             const targetMakerBox = document.getElementById(`m-${maker}`);
             if (targetMakerBox) targetMakerBox.textContent = '✔';
 
-            document.getElementById('p-shohinka').textContent = data.price.toLocaleString();
+            // 画面下の料金欄に金額を反映
+            document.getElementById('p-shohinka').textContent = price.toLocaleString();
             document.getElementById('p-unchin').textContent = unchinPrice.toLocaleString();
-            document.getElementById('p-total').textContent = (data.price + unchinPrice).toLocaleString();
+            document.getElementById('p-total').textContent = (price + unchinPrice).toLocaleString();
 
             resultArea.classList.remove('hidden');
         } else {
@@ -700,6 +721,9 @@
     fName.addEventListener('input', updateTicket);
     fPhone.addEventListener('input', updateTicket);
     locationSelect.addEventListener('change', updateTicket);
+
+    // アプリケーション起動時に料金マスターを読み込み
+    loadRecyclingFees();
 </script>
 
 </body>
