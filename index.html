@@ -33,17 +33,15 @@
         ========================================== */
         #result-area { max-width: 980px; margin: 0 auto; }
         
-        /* スマホで横スクロールを滑らかにするための調整 */
         .ticket-outer-box {
             background: white;
             padding: 15px;
             border-radius: 4px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
             overflow-x: auto;
-            -webkit-overflow-scrolling: touch; /* スマホでの慣性スクロールを有効化 */
+            -webkit-overflow-scrolling: touch;
         }
         
-        /* スマホ閲覧時のみ、スクロールできることを示す案内帯 */
         .scroll-hint {
             display: none;
             background-color: #00a86b;
@@ -62,7 +60,6 @@
             100% { opacity: 0.8; }
         }
         
-        /* 伝票本体 */
         .real-style-ticket {
             width: 950px;
             height: 540px;
@@ -76,7 +73,6 @@
             line-height: 1.2;
         }
 
-        /* 左側のメイン領域 */
         .ticket-left-body {
             width: 100%;
             height: 100%;
@@ -85,7 +81,6 @@
             box-sizing: border-box;
         }
 
-        /* ヘッダー行 */
         .ticket-header-row {
             height: 50px;
             display: flex;
@@ -114,7 +109,6 @@
             display: flex; align-items: center; justify-content: center; box-sizing: border-box; flex-shrink: 0;
         }
 
-        /* 各段の共通構造 */
         .content-row {
             display: flex;
             width: 100%;
@@ -122,7 +116,6 @@
             box-sizing: border-box;
         }
         
-        /* 緑色の縦タイトル帯 */
         .vertical-green-header {
             width: 24px; background-color: #00a86b; color: #fff; writing-mode: vertical-rl;
             text-align: center; letter-spacing: 2px; font-weight: bold; font-size: 10px;
@@ -130,11 +123,9 @@
         }
         .block-contents { flex: 1; padding: 6px; box-sizing: border-box; background: #fff; display: flex; }
 
-        /* 段1: 排出者 & 小売業者 */
         .sub-block-haishutsu { width: 340px; border-right: 2px solid #00a86b; display: flex; }
         .sub-block-kouri { flex: 1; display: flex; }
 
-        /* 小売業者ブロック内部のパーツデザイン */
         .kouri-inside-container { display: flex; flex-direction: column; width: 100%; height: 100%; }
         .kouri-date-bar {
             width: 100%; height: 16px; border-bottom: 1px solid #00a86b;
@@ -158,11 +149,9 @@
         .kouri-main-text-zone { padding: 4px 6px; font-size: 8.5px; line-height: 1.25; flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .kouri-green-lbl { color: #00a86b; font-weight: bold; margin-right: 6px; display: inline-block; }
 
-        /* 段2: 品目 ＆ 製造業者 */
         .sub-block-hinmoku { width: 340px; border-right: 2px solid #00a86b; display: flex; }
         .sub-block-seizousha { flex: 1; display: flex; }
 
-        /* 品目テーブル */
         .hinmoku-table { width: 100%; border-collapse: collapse; text-align: center; background: #fff; height: 100%; }
         .hinmoku-table th, .hinmoku-table td { border: 1px solid #00a86b; padding: 2px; font-size: 9px; vertical-align: middle; position: relative; }
         .hinmoku-table th { background-color: #e6f6f0; color: #00a86b; font-weight: bold; height: 18px; }
@@ -175,14 +164,12 @@
         }
         .code-indicator { font-size: 7px; color: #444; line-height: 1; margin-top: 2px; }
 
-        /* 緑の斜線セル */
         .slash-cell { position: relative; background: #fff; }
         .slash-cell::after {
             content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(to top right, transparent 46%, #00a86b 46%, #00a86b 54%, transparent 54%); pointer-events: none;
         }
 
-        /* 製造業者等名テーブル */
         .maker-table-real { width: 100%; border-collapse: collapse; background: #fff; height: 100%; }
         .maker-table-real td { border: 1px solid #00a86b; padding: 2px 4px; font-size: 8.5px; vertical-align: middle; box-sizing: border-box; }
         .m-cell-wrap { display: flex; align-items: center; width: 100%; height: 100%; }
@@ -199,7 +186,6 @@
         .m-other-dots-wrap { display: flex; gap: 1px; }
         .m-other-dots-wrap span { width: 10px; height: 12px; border: 1px dotted #00a86b; display: inline-block; border-radius: 1px; background: #fff; }
 
-        /* ーーー 段3: 最下段複合エリア ーーー */
         .bottom-flex-container { display: flex; width: 100%; flex: 1; box-sizing: border-box; }
         .bottom-left-notes { width: 155px; padding: 8px 6px; box-sizing: border-box; border-right: 2px solid #00a86b;}
         .notes-text-area { font-size: 8px; color: #333; line-height: 1.3; }
@@ -210,7 +196,6 @@
         .lbl-green-bg { background-color: #00a86b; color: #fff; font-weight: bold; width: 110px; }
         .val-price-text { text-align: right; font-weight: bold; color: #d6000c; font-family: monospace; }
 
-        /* 目立つ追加用注記のデザイン */
         .red-alert-tag {
             color: #ff0000;
             font-weight: bold;
@@ -220,23 +205,18 @@
             border-radius: 3px;
         }
 
-        /* 印刷設定 */
         @media print {
             .input-form-container, h2, p { display: none; }
             body { background: white; margin: 0; }
             .real-style-ticket { box-shadow: none; top: 0; left: 0; }
         }
 
-        /* スマートフォン用レスポンシブスタイル */
         @media (max-width: 768px) {
             body { margin: 10px; }
             .input-form-container { padding: 15px; }
-            /* 横並びだったフォームの行を、スマホでは縦1列に組み替える */
             .form-row { flex-direction: column; gap: 10px; margin-bottom: 0; }
             .form-group { margin-bottom: 12px; }
-            select, input { padding: 12px; font-size: 16px; } /* スマホでタップしやすいように少し大きく */
-            
-            /* スマホの時はスクロールのヒントを表示する */
+            select, input { padding: 12px; font-size: 16px; } 
             .scroll-hint { display: block; }
         }
     </style>
@@ -269,7 +249,7 @@
                 <option value="100">パナソニック（100）</option>
                 <option value="300">日立グローバルライフ（300）</option>
                 <option value="350">富士通ゼネラル（350）</option>
-                <option value="303">日立ジョンソン（303）</option>
+                <option value="300">日立ジョンソン（300）</option>
                 <option value="101">三洋電機(パナソニック)（101）</option>
                 <option value="310">シャープ（310）</option>
                 <option value="392">ハイアールジャパン（392）</option>
@@ -278,6 +258,7 @@
                 <option value="320">三菱電機（320）</option>
                 <option value="393">アクア（393）</option>
                 <option value="340">ソニー（340）</option>
+                <option value="999" style="font-weight:bold; color:blue;">上記以外のメーカー・不明（指定法人：999）</option>
             </select>
         </div>
     </div>
@@ -313,7 +294,7 @@
                     <div class="header-title-zone">
                         <span class="h-main-title">
                             家電リサイクル券 <span style="font-size:10px; font-weight:normal;">(特定家庭用機器廃棄物管理票)</span>
-                            <span class="red-alert-tag" style="font-size: 11px; margin-left: 20px;">＊リサイクル料金CD：9109980 を伝票に記入</span>
+                            <span class="red-alert-tag" id="alert-msg-top" style="font-size: 11px; margin-left: 20px;">＊リサイクル料金CD：9109980 を伝票に記入</span>
                         </span>
                         <span class="h-sub-title">①小売業者控兼受領書</span>
                     </div>
@@ -540,7 +521,7 @@
                     <div class="bottom-right-mix-zone">
                         <div style="border:1px solid #00a86b; background:#fff; height:24px; padding:2px; font-size:8px; color:#666; position: relative; box-sizing: border-box;">
                             【備考（売上伝票番号など）】
-                            <span class="red-alert-tag" style="position: absolute; right: 4px; top: 3px; font-size: 8.5px; padding: 0px 3px;">＊伝票Noを記入</span>
+                            <span class="red-alert-tag" id="alert-msg-bottom" style="position: absolute; right: 4px; top: 3px; font-size: 8.5px; padding: 0px 3px;">＊伝票Noを記入</span>
                         </div>
                         
                         <div style="font-size:9.5px; color:#ff0000; font-weight:bold; text-align:center; margin: 3px 0; background-color: #fffae6; border: 1px solid #ffcccc; padding: 3px; border-radius: 3px; letter-spacing: 0.5px;">
@@ -575,6 +556,29 @@
 </div>
 
 <script>
+    // 🌟 1ファイル完結型（外部JSON不要）のデータ定義 🌟
+    const rateMaster = {
+        "aircon": { "100": 550, "101": 550, "110": 550, "120": 550, "300": 990, "310": 990, "320": 990, "350": 990, "392": 1034, "393": 1034, "340": 2000, "999": 2000 },
+        "tv_br_21": { "100": 1320, "101": 1320, "110": 1320, "114": 1320, "300": 1870, "310": 1870, "320": 1870, "350": 1870, "392": 1364, "340": 1870, "999": 3100 },
+        "tv_br_22": { "100": 2420, "101": 2420, "110": 2420, "114": 2420, "300": 2970, "310": 2970, "320": 2970, "350": 2970, "392": 2464, "340": 2970, "999": 3700 },
+        "tv_lc_51": { "100": 1870, "101": 1870, "110": 1870, "114": 1870, "300": 1870, "310": 1870, "320": 1870, "350": 3100, "392": 1914, "340": 1870, "999": 3100 },
+        "tv_lc_52": { "100": 2970, "101": 2970, "110": 2970, "114": 2970, "300": 2970, "310": 2970, "320": 2970, "350": 2970, "392": 3014, "340": 2970, "999": 3700 },
+        "fridge_31": { "100": 3740, "101": 3740, "110": 3740, "300": 3740, "310": 3740, "320": 3740, "350": 3740, "392": 3784, "393": 3784, "999": 5200 },
+        "fridge_32": { "100": 4730, "101": 4730, "110": 4730, "300": 4730, "310": 4730, "320": 4730, "350": 4730, "392": 4774, "393": 4774, "999": 5600 },
+        "washer": { "100": 2530, "101": 2530, "110": 2530, "300": 2530, "310": 2530, "320": 2530, "350": 2530, "392": 2574, "393": 2574, "999": 3300 }
+    };
+
+    const targetIdMaster = {
+        aircon:   'chk-10',
+        tv_br_21: 'chk-21',
+        tv_br_22: 'chk-22',
+        tv_lc_51: 'chk-51',
+        tv_lc_52: 'chk-52',
+        fridge_31:'chk-31',
+        fridge_32:'chk-32',
+        washer:   'chk-40'
+    };
+
     const itemSelect = document.getElementById('item-select');
     const sizeGroup = document.getElementById('size-group');
     const sizeSelect = document.getElementById('size-select');
@@ -591,31 +595,6 @@
         tv_lc: [{ value: '51', text: '15型以下（小）[コード51]' }, { value: '52', text: '16型以上（大）[コード52]' }],
         fridge: [{ value: '31', text: '170L以下（小）[コード31]' }, { value: '32', text: '171L以上（大）[コード32]' }]
     };
-
-    // 伝票上のチェックボックスのIDと、JSONのキーの紐付け定義
-    const targetIdMaster = {
-        aircon:   'chk-10',
-        tv_br_21: 'chk-21',
-        tv_br_22: 'chk-22',
-        tv_lc_51: 'chk-51',
-        tv_lc_52: 'chk-52',
-        fridge_31:'chk-31',
-        fridge_32:'chk-32',
-        washer:   'chk-40'
-    };
-
-    let rateMaster = {}; // Pythonスクリプト経由で抽出したJSONデータを格納するオブジェクト
-
-    // Pythonで生成した外部JSONデータをロードする非同期関数
-    async function loadRecyclingFees() {
-        try {
-            const response = await fetch('recycling_fees.json');
-            rateMaster = await response.json();
-            console.log('料金データの読み込みに成功しました。', rateMaster);
-        } catch (error) {
-            console.error('料金データの読み込みに失敗しました。ローカルサーバー経由（http://...）で起動しているか確認してください。', error);
-        }
-    }
 
     function updateTicket() {
         const item = itemSelect.value;
@@ -669,33 +648,44 @@
         const isItemReady = maker && (item === 'aircon' || item === 'washer' || size);
         const isFormReady = fName.value.trim() !== "" && fPhone.value.trim() !== "" && locType !== "";
 
-        // 必須項目が揃っており、かつ料金JSONの読み込みが完了している場合のみ表示処理
-        if (isItemReady && isFormReady && Object.keys(rateMaster).length > 0) {
+        if (isItemReady && isFormReady) {
             const key = sizeOptions[item] ? `${item}_${size}` : item;
-            
-            // JSONデータから、該当品目および選択されたメーカーコードの料金を取得
             const itemFees = rateMaster[key] || {};
-            const price = itemFees[maker] || 0; 
-
+            
+            // 🌟 自動適用をやめ、対象が存在しない場合は undefined になるように変更
+            const price = itemFees[maker]; 
             const targetId = targetIdMaster[key];
-            const unchinPrice = 0; // 収集運搬料金（デフォルト設定値）
+            const unchinPrice = 0;
 
-            // 伝票上のチェックボックスを一旦初期化
             document.querySelectorAll('.check-box-slot').forEach(el => el.textContent = '');
 
-            // 該当する品目区分にチェック
-            if(document.getElementById(targetId)) {
-                document.getElementById(targetId).textContent = '✔';
-            }
-            
-            // 該当する主要メーカー等名にチェック
-            const targetMakerBox = document.getElementById(`m-${maker}`);
-            if (targetMakerBox) targetMakerBox.textContent = '✔';
+            if (price !== undefined) {
+                // 正しいメーカーと品目の組み合わせの場合（正常処理）
+                if(document.getElementById(targetId)) {
+                    document.getElementById(targetId).textContent = '✔';
+                }
+                const targetMakerBox = document.getElementById(`m-${maker}`);
+                if (targetMakerBox) targetMakerBox.textContent = '✔';
 
-            // 画面下の料金欄に金額を反映
-            document.getElementById('p-shohinka').textContent = price.toLocaleString();
-            document.getElementById('p-unchin').textContent = unchinPrice.toLocaleString();
-            document.getElementById('p-total').textContent = (price + unchinPrice).toLocaleString();
+                document.getElementById('p-shohinka').textContent = price.toLocaleString();
+                document.getElementById('p-unchin').textContent = unchinPrice.toLocaleString();
+                document.getElementById('p-total').textContent = (price + unchinPrice).toLocaleString();
+
+                // アラートメッセージを元に戻す
+                const alertBox = document.getElementById('alert-msg-bottom');
+                alertBox.textContent = '＊伝票Noを記入';
+                alertBox.style.color = '#ff0000';
+            } else {
+                // 🌟 エラー処理：データが存在しない組み合わせの場合
+                document.getElementById('p-shohinka').textContent = '---';
+                document.getElementById('p-unchin').textContent = '---';
+                document.getElementById('p-total').textContent = '---';
+
+                // 目立つようにエラー文を表示
+                const alertBox = document.getElementById('alert-msg-bottom');
+                alertBox.textContent = '⚠️ エラー：選択した品目のメーカー料金が存在しません';
+                alertBox.style.color = '#d6000c';
+            }
 
             resultArea.classList.remove('hidden');
         } else {
@@ -721,9 +711,6 @@
     fName.addEventListener('input', updateTicket);
     fPhone.addEventListener('input', updateTicket);
     locationSelect.addEventListener('change', updateTicket);
-
-    // アプリケーション起動時に料金マスターを読み込み
-    loadRecyclingFees();
 </script>
 
 </body>
